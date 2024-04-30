@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import LogoutComponent from './LogoutComponent';
 import FooterComponent from './FooterComponent';
@@ -7,18 +7,28 @@ import ListTodoComponent from './ListTodoComponent';
 import WelcomeComponent from './WelcomeComponent';
 import ErrorComponent from './ErrorComponent';
 import LoginComponent from './LoginComponent';
-import AuthProvider from './security/AuthContext';
+import AuthProvider, { useAuth } from './security/AuthContext';
 // importing auth cointext fron AuthContext.jx, 
 // need to esport this  cotext from that file
-import { AuthContext } from './security/AuthContext';
+//import { AuthContext } from './security/AuthContext';
 
 import './TodoApp.css'
-import { useContext } from 'react';
+//import { useContext } from 'react';
+
+function AuthenticatedRoute( {children}) {
+    const authContext = useAuth()
+
+    if(authContext.isAuthenitcated)
+        return children
+
+    return <Navigate to ='/todo-ui'/>
+
+}
 
 export default function TodoApp () {
 
     // setting up authcontext to get data from AuthContext js file
-    const authContext = useContext(AuthContext)
+    //const authContext = useContext(AuthContext)
     
     return (
         <div className="TodoApp">
@@ -30,9 +40,19 @@ export default function TodoApp () {
                             <Route path='/' element={ <LoginComponent />} />
                             <Route path='/todo-ui' element={ <LoginComponent />} />
                             <Route path='/todo-ui/login' element={ <LoginComponent /> } />
-                            <Route path='/todo-ui/welcome/:username' element={ <WelcomeComponent /> } />
-                            <Route path='/todo-ui/todos' element={ <ListTodoComponent /> } />
-                            <Route path='/todo-ui/logout' element={ <LogoutComponent /> } />
+
+                            <Route path='/todo-ui/welcome/:username' element={ 
+                            <AuthenticatedRoute>
+                                    <WelcomeComponent /> 
+                            </AuthenticatedRoute>} />
+                            <Route path='/todo-ui/todos' element={ 
+                            <AuthenticatedRoute>
+                                <ListTodoComponent /> 
+                            </AuthenticatedRoute>} />
+                            <Route path='/todo-ui/logout' element={ 
+                            <AuthenticatedRoute>
+                                <LogoutComponent /> 
+                            </AuthenticatedRoute>} />
                             <Route path='*' element={ <ErrorComponent /> } />
                         </Routes>
                     <FooterComponent/>

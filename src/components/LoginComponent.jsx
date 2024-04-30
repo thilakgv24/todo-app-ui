@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate} from 'react-router-dom';
+import { useAuth } from './security/AuthContext';
 
 function LoginComponent() {
 
@@ -9,11 +10,13 @@ function LoginComponent() {
 
     const [password, setPassword]  = useState('');
 
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    //const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     const [showErrorMessages, setShowErrorMessage] = useState(false);
 
     const navigate = useNavigate()
+
+    const authContext = useAuth()
 
     function handleUserNameChange(event) {
         setUserName(event.target.value); // this is coming from event from browser
@@ -24,16 +27,14 @@ function LoginComponent() {
         setPassword(event.target.value);
     }
 
-    function handleSubmit(event) {
-        if(userName === 'sachin' && password === 'dummy')  {
-            console.log('sucess')   
-            setShowSuccessMessage(true) 
-            setShowErrorMessage(false)  
-            navigate(`/todo-ui/welcome/${userName}`)     
+    function handleSubmit() {
+        if( authContext.login(userName, password))  {
+            // setShowSuccessMessage(true) 
+            // setShowErrorMessage(false)  
+            navigate(`/todo-ui/welcome/${userName}`) 
         } else {
-            console.log('Failed')
-            setShowSuccessMessage(false)  
-            setShowErrorMessage(true)
+            //setShowSuccessMessage(false)  
+            setShowErrorMessage(true) 
         }
     }  
     // function SuccessMessageComponent() {
@@ -61,7 +62,7 @@ function LoginComponent() {
            {/* <ErrorMessageComponent/> */}
 
             {/* adding error component u-pdated to above*/}
-            {showSuccessMessage && <div className = "successMessage">Autnehticated Successfully</div>}
+            {/* {showSuccessMessage && <div className = "successMessage">Autnehticated Successfully</div>} */}
 
             {showErrorMessages && <div className = "ErrorMessage">Autnehtication Failed</div>}
             
